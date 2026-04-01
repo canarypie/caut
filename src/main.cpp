@@ -9,11 +9,6 @@
 #include <fstream>
 #include <unistd.h>
 
-#define ROWS 10
-#define COLS 12
-#define CELLS (ROWS * COLS)
-
-#define SIMULATIONS 240
 
 /* 1D grid showcase
  *
@@ -29,19 +24,24 @@
  * col = x position, row = y position
  */
 
+static constexpr int ROWS = 10;
+static constexpr int COLS = 10;
+static constexpr int SIMULATIONS = 100;
+static constexpr std::string PATTERN = "random";
 
 // general configuration for our program
 struct Config {
 
 	// default dimensions
-	int rows = 10;
-	int cols = 12;
+	int rows = ROWS;
+	int cols = COLS;
 	
-	std::string pattern = "random";
+	std::string pattern = PATTERN;
 	std::string file;
 
+	// for later demo mode
 	bool demo = false;
-	int simulations = 240;
+	int simulations = SIMULATIONS;
 
 	static Config handle_arguments(const int count, char** arguments);
 };
@@ -162,27 +162,6 @@ void GOLSystem::swap_buffers()
 	std::swap(current, future);
 }
 
-// void GOLSystem::init()
-// {
-	// grid.current.fill(0);
-	// grid.future.fill(0);
-
-	// // auto filePattern = read_pattern_from_file("glider.txt");
-	// // std::copy_n(filePattern.begin(), filePattern.size(), grid.current.begin());
-
-	// current = std::span<uint8_t>(grid.current);
-
-	// if (pattern.compare("glider") == 0) init_glider();
-	// // else if (pattern.compare("blinker") == 0) init_blinker();
-	// // else init_random();
-
-	// future = std::span<uint8_t>(grid.future);
-
-
-	// print_grid(current);
-
-// }
-
 void GOLSystem::next_generation(std::span<const uint8_t> current)
 {
 	for (int y = 0; y < grid.rows; y++) {
@@ -224,6 +203,7 @@ void GOLSystem::run()
 
 void GOLSystem::load_pattern(std::string_view pattern)
 {
+	// for later checking through a map
 	if (pattern.compare("glider") == 0) init_glider();
 	else if (pattern.compare("blinker") == 0) init_blinker();
 	else init_random();
