@@ -29,6 +29,8 @@ static constexpr int COLS = 10;
 static constexpr int SIMULATIONS = 100;
 static constexpr std::string PATTERN = "random";
 
+// static constexpr std::string ANSI_ESCAPE = "\033[2J\033[H";
+
 // general configuration for our program
 struct Config {
 
@@ -59,6 +61,7 @@ static constexpr std::array<Offset, 8> directions = {{
 	{-1, 1}, {0, 1}, {1, 1}
 }};
 
+
 class Grid {
 public:
 	std::vector<uint8_t> current;
@@ -77,10 +80,11 @@ private:
 	int simulations;
 	int gen = 0;
 
+	std::string write_buffer;
+
 public:
 	GOLSystem(const Config& config);
 	
-	//buffer pointers for double buffering
 	std::span<uint8_t> current;
 	std::span<uint8_t> future;
 
@@ -111,7 +115,6 @@ int main(int argc, char** argv)
 {
 
 	auto config = Config::handle_arguments(argc, argv);
-	
 	//read file
 	// std::vector<uint8_t> pattern = read_pattern_from_file("glider.txt");
 
@@ -139,13 +142,17 @@ int wrap_cell(const int& cell, const int& limit)
 // CLASS SYSTEM
 void GOLSystem::draw(std::span<const uint8_t> current)
 {
+	write_buffer.clear();
+
 	//set terminal properties
-	std::cout << "\033[2J\033[H";
-	std::cout << "Generation " << gen << '\n';
+	write_buffer += "\033[2J\033[H";
+	write_buffer += "Generation " + std::to_string(gen) + '\n';
 
 	print_grid(current);
 
-	std::cout << "alive: " << grid.alive << '\n';
+	write_buffer += "alive: " + std::to_string(grid.alive) + '\n';
+
+	::write(STDOUT_FILENO, write_buffer.data(), write_buffer.size());
 }
 
 void GOLSystem::print_grid(std::span<const uint8_t> current)
@@ -154,9 +161,9 @@ void GOLSystem::print_grid(std::span<const uint8_t> current)
 		const auto row_index = y * grid.cols;
 		for (int x = 0; x < grid.cols; x++) {
 			const auto idx = row_index + x;
-			std::cout << (current[idx] ? "■ " : ". ");
+			write_buffer += (current[idx] ? "■ " : ". ");
 		}
-		std::cout << '\n';
+		write_buffer += '\n';
 	}
 }
 
@@ -198,8 +205,13 @@ void GOLSystem::run()
 {
 	for (int i = 0; i < simulations; i++) {
 		next_generation(current);
-		swap_buffers();
 
+		if (grid.alive == 0) {
+			std::cout << "No cells alive!\n";
+			exit(0);
+		}
+
+		swap_buffers();
 		draw(current);
 
 		//wait
@@ -281,6 +293,7 @@ GOLSystem::GOLSystem(const Config& config) : grid(config.rows, config.cols), sim
 	}
 	else if (!config.pattern.empty()) load_pattern(config.pattern);
 
+
 	current = std::span<uint8_t>(grid.current);
 	future = std::span<uint8_t>(grid.future);
 	
@@ -305,6 +318,7 @@ void GOLSystem::parse_grid(std::vector<uint8_t>& buf)
 		b -= '0';
 	}
 }
+
 
 Grid::Grid(const int rows, const int cols) : rows(rows), cols(cols)
 {
