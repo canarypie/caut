@@ -27,7 +27,7 @@
 static constexpr int ROWS = 10;
 static constexpr int COLS = 10;
 static constexpr int SIMULATIONS = 100;
-static constexpr std::string PATTERN = "random";
+static constexpr std::string_view PATTERN = "random";
 
 // static constexpr std::string ANSI_ESCAPE = "\033[2J\033[H";
 
@@ -38,7 +38,7 @@ struct Config {
 	int rows = ROWS;
 	int cols = COLS;
 	
-	std::string pattern = PATTERN;
+	std::string pattern = std::string(PATTERN);
 	std::string file;
 
 	// for later demo mode
@@ -91,7 +91,6 @@ public:
 	void draw(std::span<const uint8_t> current);
 	void next_generation(std::span<const uint8_t> current);
 	void swap_buffers();
-	void reset();
 	void run();
 
 private:
@@ -113,18 +112,12 @@ static void print_usage();
 
 int main(int argc, char** argv)
 {
-
 	auto config = Config::handle_arguments(argc, argv);
-	//read file
-	// std::vector<uint8_t> pattern = read_pattern_from_file("glider.txt");
 
 	GOLSystem system(config);
-	// system.init();
-
 	system.run();
 
 	return 0;
-
 }
 
 
@@ -347,10 +340,10 @@ Config Config::handle_arguments(const int count, char** arguments)
 			}
 			case 'v':
 				std::cout << "ConwayGOL version " << GOL_VERSION << '\n'; 
-				exit(1);
+				exit(0);
 			case 'h':
 				print_usage();
-				exit(1);
+				exit(0);
 			case 's':
 			{
 				config.simulations = std::stoi(optarg);
