@@ -29,6 +29,11 @@ else()
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
+# version
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+	GOL_VERSION="${PROJECT_VERSION}"
+)
+
 # Build Ordner nach /bin kopieren
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
