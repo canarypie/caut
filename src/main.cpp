@@ -68,6 +68,7 @@ public:
 
 	int rows;
 	int cols;
+	int alive = 0;
 };
 
 class GOLSystem {
@@ -143,6 +144,8 @@ void GOLSystem::draw(std::span<const uint8_t> current)
 	std::cout << "Generation " << gen << '\n';
 
 	print_grid(current);
+
+	std::cout << "alive: " << grid.alive << '\n';
 }
 
 void GOLSystem::print_grid(std::span<const uint8_t> current)
@@ -164,6 +167,8 @@ void GOLSystem::swap_buffers()
 
 void GOLSystem::next_generation(std::span<const uint8_t> current)
 {
+	grid.alive = 0;
+
 	for (int y = 0; y < grid.rows; y++) {
 		const auto row_index = y * grid.cols;
 
@@ -181,6 +186,7 @@ void GOLSystem::next_generation(std::span<const uint8_t> current)
 
 			}
 			future[idx] = (aliveNeighbors == 3) || (aliveNeighbors == 2 && current[idx]);
+			grid.alive += future[idx];
 		}
 	}
 
