@@ -17,7 +17,7 @@ void Renderer::draw(std::span<const uint8_t> grid, const int alive, const int ge
 		const auto row_index = y * cfg.cols;
 		for (int x = 0; x < cfg.cols; x++) {
 			const auto idx = row_index + x;
-			framebuffer += (grid[idx] ? "■ " : ". ");
+			framebuffer += cfg.color_map[grid[idx]];
 		}
 		framebuffer += '\n';
 	}

@@ -92,10 +92,15 @@ void GOLSystem::next_generation(std::span<const uint8_t> current)
 				const auto c = wrap_cell((dir.x + x), grid.cols);
 
 				const auto n_idx = r * grid.cols + c;
-				aliveNeighbors += current[n_idx];
+
+				//only checks the lowest bit for generally living or dying state
+				aliveNeighbors += (current[n_idx] & 1);
 
 			}
+
 			future[idx] = (aliveNeighbors == 3) || (aliveNeighbors == 2 && current[idx]);
+
+			
 			alive += future[idx];
 		}
 	}
