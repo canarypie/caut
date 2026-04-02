@@ -16,6 +16,7 @@ endif()
 
 # Source Files (passe die Pfade an deine Struktu
 file(GLOB_RECURSE SOURCES "src/*.cpp")
+list(REMOVE_ITEM SOURCES "${CMAKE_SOURCE_DIR}/src/main.cpp")
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
