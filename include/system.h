@@ -4,6 +4,7 @@
 #include "grid.h"
 #include "renderer.h"
 #include "arguments.h"
+#include "neighbor.h"
 
 
 class GOLSystem {
@@ -18,7 +19,9 @@ private:
 	std::vector<uint8_t> future_buf;
 	std::span<uint8_t> future;
 
+	Neighbors neighbors;
 	Renderer renderer;
+
 public:
 	GOLSystem(const Config& config);
 	void run();
@@ -33,14 +36,10 @@ private:
 	void swap_buffers();
 };
 
-// predefined dirs we can just loop through without nested looping
-struct Offset {
-	int x;
-	int y;
+
+static constexpr uint8_t states[2][2] = {
+	{0, 3}, // for birth state
+	{2, 1}  // for survival state
 };
 
-static constexpr std::array<Offset, 8> directions = {{
-	{-1, -1}, {0, -1}, {1, -1},
-	{-1, 0},           {1, 0},
-	{-1, 1}, {0, 1}, {1, 1}
-}};
+static constexpr uint8_t masks[2] = {(1 << 3), (1 << 2) | (1 << 3)}; 

@@ -17,19 +17,20 @@ GOLSystem::GOLSystem(const Config& config) : grid(config.rows, config.cols), sim
 	}
 	else if (!config.pattern.empty()) load_pattern(config.pattern);
 
+	//intialize neighbor indices table
+	neighbors = Neighbors(grid.rows, grid.cols, config.neighbors_type);
+
+	current = std::span<uint8_t>(grid.data);
+	future_buf.assign(grid.rows * grid.cols, 0);	
+	future = std::span<uint8_t>(future_buf);
+
+	//prepare renderer
 	RenderCfg cfg{};
 	cfg.rows = grid.rows;
 	cfg.cols = grid.cols;
 	cfg.simulations = config.simulations;
 
 	renderer = Renderer(cfg);
-
-	current = std::span<uint8_t>(grid.data);
-
-	//reserve space for future buffer
-	future_buf.assign(grid.rows * grid.cols, 0);	
-
-	future = std::span<uint8_t>(future_buf);
 }
 
 void GOLSystem::load_pattern(std::string_view pattern)
@@ -79,6 +80,8 @@ void GOLSystem::next_generation(std::span<const uint8_t> current)
 {
 	alive = 0;
 	
+	const int range = static_cast<int>(neighbors.type);
+
 	for (int y = 0; y < grid.rows; y++) {
 		const auto row_index = y * grid.cols;
 
@@ -87,21 +90,19 @@ void GOLSystem::next_generation(std::span<const uint8_t> current)
 
 			int aliveNeighbors = 0;
 			
-			for (const auto& dir : directions) {
-				const auto r = wrap_cell((dir.y + y), grid.rows);
-				const auto c = wrap_cell((dir.x + x), grid.cols);
-
-				const auto n_idx = r * grid.cols + c;
-
-				//only checks the lowest bit for generally living or dying state
-				aliveNeighbors += (current[n_idx] & 1);
-
+			// precomputed indices lookup table
+			for (int i = 0; i < range; i++)
+			{
+				aliveNeighbors += (current[neighbors.indices[idx * range + i]] & 1);
 			}
 
-			future[idx] = (aliveNeighbors == 3) || (aliveNeighbors == 2 && current[idx]);
+			int is_alive = (current[idx] & 1);
+
+			int will_live = ((masks[is_alive] >> aliveNeighbors) & 1);
+			future[idx] = states[is_alive][will_live];
 
 			
-			alive += future[idx];
+			alive += (future[idx] & 1);
 		}
 	}
 

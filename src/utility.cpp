@@ -1,16 +1,5 @@
 #include "utility.h"
 
-int wrap_cell(const int cell, const int limit)
-{
-	if (cell < 0) {
-		return cell + limit;
-	}
-	else if (cell >= limit) {
-		return cell - limit;
-	}
-	return cell;
-}
-
 std::vector<uint8_t> read_buffer(const char* filePath)
 {
 	std::ifstream file(filePath, std::ios::ate | std::ios::binary);

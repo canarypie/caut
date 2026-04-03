@@ -7,7 +7,7 @@ Config Config::handle_arguments(const int count, char** arguments)
 	Config config;
 
 	int opt;
-	while ((opt = getopt(count, arguments, "p:f:s:r:c:vh")) != -1)
+	while ((opt = getopt(count, arguments, "p:f:s:r:c:N:vh")) != -1)
 	{
 		switch (opt)
 		{
@@ -40,6 +40,11 @@ Config Config::handle_arguments(const int count, char** arguments)
 			case 'c':
 			{
 				config.cols = std::stoi(optarg);
+				break;
+			}
+			case 'N':
+			{
+				config.neighbors_type = optarg;
 				break;
 			}
 			default:
