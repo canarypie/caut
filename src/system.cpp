@@ -82,27 +82,40 @@ void GOLSystem::next_generation(std::span<const uint8_t> current)
 	
 	const int range = static_cast<int>(neighbors.type);
 
-	for (int y = 0; y < grid.rows; y++) {
-		const auto row_index = y * grid.cols;
+	//outer loop for tiling the grid
+	for (int ty = 0; ty < grid.rows; ty += 32) {
+		for (int tx = 0; tx < grid.cols; tx += 32) {
 
-		for (int x = 0; x < grid.cols; x++) {
-			const auto idx = row_index + x;
+			//inner loop for looping through the grid in chunks
+			//we control how many rows/cols we iterate through at once
+			//we do this, because our cache access is bottlenecked if the data gets larger than L1/L2 sizes
 
-			int aliveNeighbors = 0;
-			
-			// precomputed indices lookup table
-			for (int i = 0; i < range; i++)
-			{
-				aliveNeighbors += (current[neighbors.indices[idx * range + i]] & 1);
+			int row_limit = std::min(grid.rows, ty + 32);
+			int col_limit = std::min(grid.cols, tx + 32);
+
+			for (int y = ty; y < row_limit; y++) {
+				const auto row_index = y * grid.cols;
+
+				for (int x = tx; x < col_limit; x++) {
+					const auto idx = row_index + x;
+
+					int aliveNeighbors = 0;
+
+					//precomputed indices lookup table
+					for (int i = 0; i < range; i++)
+					{
+						aliveNeighbors += (current[neighbors.indices[idx * range + i]] & 1);
+					}
+
+					int is_alive = (current[idx] & 1);
+
+					int will_live ((masks[is_alive] >> aliveNeighbors) & 1);
+
+					future[idx] = states[is_alive][will_live];
+
+					alive += (future[idx] & 1);
+				}
 			}
-
-			int is_alive = (current[idx] & 1);
-
-			int will_live = ((masks[is_alive] >> aliveNeighbors) & 1);
-			future[idx] = states[is_alive][will_live];
-
-			
-			alive += (future[idx] & 1);
 		}
 	}
 
