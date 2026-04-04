@@ -6,6 +6,7 @@
 #include <iostream>
 #include "utility.h"
 #include "arguments.h"
+#include "ruleset.h"
 
 GOLSystem::GOLSystem(const Config& config) : grid(config.rows, config.cols), simulations(config.simulations)
 {
@@ -17,12 +18,15 @@ GOLSystem::GOLSystem(const Config& config) : grid(config.rows, config.cols), sim
 	}
 	else if (!config.pattern.empty()) load_pattern(config.pattern);
 
-	//intialize neighbor indices table
-	neighbors = Neighbors(grid.rows, grid.cols, config.neighbors_type);
 
 	current = std::span<uint8_t>(grid.data);
 	future_buf.assign(grid.rows * grid.cols, 0);	
 	future = std::span<uint8_t>(future_buf);
+
+	//intialize neighbor indices table
+	neighbors = Neighbors(grid.rows, grid.cols, config.neighbors_type);
+
+	rule = RuleSet(config.rule);
 
 	//prepare renderer
 	RenderCfg cfg{};
@@ -37,6 +41,7 @@ void GOLSystem::load_pattern(std::string_view pattern)
 {
 	if (pattern.compare("glider") == 0) init_glider();
 	else if (pattern.compare("blinker") == 0) init_blinker();
+	else if (pattern == "diamond") init_diamond();
 	else init_random();
 }
 
@@ -56,6 +61,15 @@ void GOLSystem::init_blinker()
 	grid.data[1 * grid.cols + 0] = 1;  // (1, 0)
     grid.data[1 * grid.cols + 1] = 1;  // (1, 1)
     grid.data[1 * grid.cols + 2] = 1;  // (1, 2)
+}
+
+void GOLSystem::init_diamond()
+{
+	//Diamond pattern that expands recursively with Von Neumann Neighbors
+	const auto row_half = grid.rows / 2;
+	const auto col_half = grid.cols / 2;
+
+	grid.data[row_half * grid.cols + col_half] = 1;
 }
 
 void GOLSystem::init_random()
@@ -109,7 +123,7 @@ void GOLSystem::next_generation(std::span<const uint8_t> current)
 
 					int is_alive = (current[idx] & 1);
 
-					int will_live ((masks[is_alive] >> aliveNeighbors) & 1);
+					int will_live ((rule.masks[is_alive] >> aliveNeighbors) & 1);
 
 					future[idx] = states[is_alive][will_live];
 

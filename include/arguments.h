@@ -11,6 +11,7 @@ static constexpr int COLS = 10;
 static constexpr int SIMULATIONS = 100;
 static constexpr std::string_view PATTERN = "random";
 static constexpr std::string_view NEIGHBOR = "moore";
+static constexpr std::string_view RULE = "conway";
 
 // general configuration for our program
 struct Config {
@@ -19,6 +20,7 @@ struct Config {
 	int rows = ROWS;
 	int cols = COLS;
 	std::string neighbors_type = std::string(NEIGHBOR);
+	std::string rule = std::string(RULE);
 	
 	std::string pattern = std::string(PATTERN);
 	std::string file;

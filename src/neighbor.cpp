@@ -10,9 +10,9 @@ static constexpr std::array<Offset, 8> MOORE_DIRECTIONS {{
 
 static constexpr std::array<Offset, 4> VON_NEUMANN_DIRECTIONS {{
 	{-1, 0},
-	{0, -1},
+	{0, 1},
 	{1, 0},
-	{0, 1}
+	{0, -1}
 }};
 
 int wrap_cell(const int cell, const int limit)
