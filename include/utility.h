@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <iostream>
 #include <vector>
+#include <string_view>
 
-std::vector<uint8_t> read_buffer(const char* filePath);
+std::vector<unsigned char> read_buffer(std::string_view filePath);
 void print_usage();

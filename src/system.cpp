@@ -7,14 +7,24 @@
 #include "utility.h"
 #include "arguments.h"
 #include "ruleset.h"
+#include "fileparser.h"
+
+using namespace FileParser;
 
 GOLSystem::GOLSystem(const Config& config) : grid(config.rows, config.cols), simulations(config.simulations)
 {
-	if (!config.file.empty()) {
-		auto file = read_buffer(config.file.c_str());
-		grid.parse_grid(file);
+	rule = RuleSet(config.rule);
 
-		grid.data = std::move(file);
+	if (!config.file.empty()) {
+		FileParser::FileData file = FileParser::parse_file(config.file);		
+		grid.cols = file.width;
+		grid.rows = file.height;
+
+		rule = RuleSet(file.rule);
+
+		// grid.parse_grid(file);
+
+		grid.data = std::move(file.grid);
 	}
 	else if (!config.pattern.empty()) load_pattern(config.pattern);
 
@@ -26,7 +36,6 @@ GOLSystem::GOLSystem(const Config& config) : grid(config.rows, config.cols), sim
 	//intialize neighbor indices table
 	neighbors = Neighbors(grid.rows, grid.cols, config.neighbors_type);
 
-	rule = RuleSet(config.rule);
 
 	//prepare renderer
 	RenderCfg cfg{};
@@ -150,7 +159,7 @@ void GOLSystem::run()
 		renderer.draw(current, alive, gen);
 
 		//wait
-		std::this_thread::sleep_for(std::chrono::milliseconds(50));
+		std::this_thread::sleep_for(std::chrono::milliseconds(120));
 	}
 }
 

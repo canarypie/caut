@@ -1,12 +1,12 @@
 #include "utility.h"
 
-std::vector<uint8_t> read_buffer(const char* filePath)
+std::vector<unsigned char> read_buffer(std::string_view filePath)
 {
-	std::ifstream file(filePath, std::ios::ate | std::ios::binary);
+	std::ifstream file(std::string(filePath), std::ios::ate | std::ios::binary);
 
 	size_t fileSize = (size_t)file.tellg();
 
-	std::vector<uint8_t> buffer(fileSize / sizeof(uint8_t));
+	std::vector<unsigned char> buffer(fileSize);
 
 	file.seekg(0);
 	file.read((char*)buffer.data(), fileSize);

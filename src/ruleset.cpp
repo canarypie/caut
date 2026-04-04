@@ -18,14 +18,14 @@ RuleSet::RuleSet(std::string_view rule) : rule(rule)
 }
 
 
-//for B/S notation
 void RuleSet::update(std::string_view rule)
 {
 	this->rule = rule;
-	parse_rule(rule);
+	masks = parse_rule(rule);
 
 }
 
+//for B/S notation
 std::array<uint16_t, 2> RuleSet::parse_rule(std::string_view rule)
 {
 	uint16_t birth_mask;
@@ -34,7 +34,6 @@ std::array<uint16_t, 2> RuleSet::parse_rule(std::string_view rule)
 	//split into 2 substrings
 	std::string_view birth_rule = rule.substr(0, rule.find('/'));
 	std::string_view survival_rule = rule.substr(rule.find('/') + 1);
-	
 	
 	static constexpr auto set_mask = ([](std::string_view rule_view) {
 		uint16_t mask = 0;
