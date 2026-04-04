@@ -36,7 +36,7 @@ std::array<uint16_t, 2> RuleSet::parse_rule(std::string_view rule)
 	std::string_view survival_rule = rule.substr(rule.find('/') + 1);
 	
 	
-	static constexpr auto set_mask = ([&](std::string_view rule_view) {
+	static constexpr auto set_mask = ([](std::string_view rule_view) {
 		uint16_t mask = 0;
 
 		for (int i = 0; i < rule_view.length(); i++) {
