@@ -8,6 +8,12 @@
 #include "ruleset.h"
 
 
+enum class Mode {
+	HEADLESS,
+	IMAGE_EXPORT,
+	NORMAL
+};
+
 class GOLSystem {
 private:
 	Grid grid;
@@ -24,6 +30,7 @@ private:
 	RuleSet rule;
 
 	Renderer renderer;
+	Mode mode = Mode::NORMAL;
 
 public:
 	GOLSystem(const Config& config);
@@ -40,48 +47,8 @@ private:
 	void swap_buffers();
 };
 
-//struct RuleSet {
-
-//	std::string_view name;
-
-//	//we define a uint16_t lookup table for birth and survival masks
-//	//we need uint16_t, since rules like day and night need to shift 8 bits
-//	uint16_t masks[2];
-
-//};
 
 static constexpr uint8_t states[2][2] = {
 	{0, 3}, // for birth state
 	{2, 1}  // for survival state
 };
-
-//predefine masks for different rule sets. top is birth rules, bottom is survival rules. Follows B/S notation
-// static constexpr uint8_t CONWAY_RULES = {
-// 	(1 << 3),
-// 	(1 << 2) | (1 << 3)
-// };
-
-// static constexpr uint8_t HIGHLIFE_RULES = {
-// 	(1 << 3) | (1 << 6),
-// 	(1 << 2) | (1 << 3)
-// };
-
-// static constexpr uint8_t SEEDS_RULES = {
-// 	(1 << 2),
-// 	0
-// };
-
-// static constexpr uint16_t DAYNIGHT_RULES = {
-// 	(1 << 3) | (1 << 6) | (1 << 7) | (1 << 8),
-// 	(1 << 3) | (1 << 4) | (1 << 6) | (1 << 7) | (1 << 8)
-// };
-
-// static constexpr uint8_t MAZE_RULES = {
-// 	(1 << 3),
-// 	(1 << 1) | (1 << 2) | (1 << 3) | (1 << 4) | (1 << 5)
-// };
-
-// static constexpr uint16_t DIAMOEBA_RULES = {
-// 	(1 << 3) | (1 << 5) | (1 << 6) | (1 << 7) | (1 << 8),
-// 	(1 << 5) | (1 << 6) | (1 << 7) | (1 << 8)
-// };

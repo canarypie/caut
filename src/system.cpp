@@ -44,6 +44,9 @@ GOLSystem::GOLSystem(const Config& config) : grid(config.rows, config.cols), sim
 	cfg.simulations = config.simulations;
 
 	renderer = Renderer(cfg);
+
+	//set run mode
+	if (config.export_ppm) mode = Mode::IMAGE_EXPORT;
 }
 
 void GOLSystem::load_pattern(std::string_view pattern)
@@ -150,16 +153,24 @@ void GOLSystem::run()
 	for (int i = 0; i < simulations; i++) {
 		next_generation(current);
 
+		//stop the simulation if all cells are dead
 		if (alive == 0) {
-			std::cout << "No cells alive!\n";
 			exit(1);
 		}
 
 		swap_buffers();
-		renderer.draw(current, alive, gen);
 
-		//wait
-		std::this_thread::sleep_for(std::chrono::milliseconds(120));
+		switch(mode) {
+			case Mode::NORMAL:
+				renderer.draw(current, alive, gen);
+				std::this_thread::sleep_for(std::chrono::milliseconds(120));
+				break;
+			case Mode::IMAGE_EXPORT:
+				renderer.output_ppm(current, gen);
+				break;
+			default:
+				break;
+		}
 	}
 }
 

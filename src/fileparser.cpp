@@ -133,7 +133,7 @@ FileData FileParser::parse_rle(std::span<unsigned char> file)
 //currently only supports direct 0 and 1 files
 FileData FileParser::parse_txt(std::span<unsigned char> file)
 {
-	std::string buffer(reinterpret_cast<const char*>(file.data()), file.size());
+	std::string_view buffer(reinterpret_cast<const char*>(file.data()), file.size());
 
 	int width = 0;
 	int height = 0;
@@ -142,19 +142,89 @@ FileData FileParser::parse_txt(std::span<unsigned char> file)
 	std::string rule = "conway";
 	std::vector<uint8_t> data;
 
-	height = std::count(buffer.begin(), buffer.end(), '\n');
-	if (file.back() != '\n') height++;
+	//skip comments - starting with exclamation marks in .cells
+	size_t line_start = 0;
+	const auto char_count = buffer.size();
 
-	if (width > 0 && height > 0) data.reserve(width * height);
+	while (line_start < char_count && buffer[line_start] == '!') {
+		line_start = buffer.find('\n', line_start);
+		if (line_start == std::string_view::npos || char_count <= line_start) return {};
 
-	std::erase(buffer, '\n');
-	std::erase(buffer, '\r');
-
-	width = buffer.size() / height;
-
-	for (const auto& b : buffer){
-		data.push_back((b - '0'));	
+		line_start++;
 	}
+
+	auto is_alive = ([](const unsigned char sign) -> bool {
+		static constexpr std::string_view alive = "1#O";
+		static constexpr std::string_view dead = "#.0";
+
+		return (alive.find(sign) != std::string_view::npos);
+	});
+
+	//we take the widest row - i is beginning of row. we count width and height
+	for (int i = line_start; i < char_count; i++) {
+		//find newline pos
+		const auto line_end = buffer.find('\n', i);
+		size_t length = 0;
+
+		if (line_end == std::string_view::npos) {
+			length = char_count - i;
+			width = std::max(int(width), int(length));
+			height++;
+
+			break;
+		} else {
+			length = line_end - i;
+		}
+
+		width = std::max(int(width), int(length));
+		height++;
+
+		i = line_end;
+	}
+	
+	data.reserve(width * height);
+	for (int i = line_start; i < char_count; i++) {
+
+		if (i < char_count && buffer[i] != '\n') {
+			bool state = is_alive(buffer[i]);
+			data.insert(data.end(), 1, state);
+		}	
+
+		//Newline
+		const auto line_end = buffer.find('\n', i);
+
+		if (buffer[i] == '\n') {
+		    data.insert(data.end(), width, 0);
+			i = line_end - 1;
+			continue;
+		}
+
+		//EOF
+		if (line_end == std::string_view::npos) {
+			if (i == (char_count - 1)) {
+				const auto col_count = data.size() % width;
+				if (col_count > 0) {
+					const auto cell_pad = width - col_count;
+					data.insert(data.end(), cell_pad, 0);
+				}
+			}
+			//break loop
+			break;
+		}
+
+		//padding for last column in row
+		if (i == (line_end - 1)) {
+			const auto col_count = data.size() % width;
+			if (col_count > 0) {
+				const auto cell_pad = width - col_count;
+				data.insert(data.end(), cell_pad, 0);
+			}
+		}
+		
+		if (line_end > char_count) break;
+	}
+
 
 	return FileData{width, height, rule, data};
 }
+

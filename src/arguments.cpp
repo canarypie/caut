@@ -7,7 +7,7 @@ Config Config::handle_arguments(const int count, char** arguments)
 	Config config;
 
 	int opt;
-	while ((opt = getopt(count, arguments, "p:f:s:r:c:N:R:vh")) != -1)
+	while ((opt = getopt(count, arguments, "p:f:s:r:c:N:R:Evh")) != -1)
 	{
 		switch (opt)
 		{
@@ -50,6 +50,11 @@ Config Config::handle_arguments(const int count, char** arguments)
 			case 'R':
 			{
 				config.rule = optarg;
+				break;
+			}
+			case 'E':
+			{
+				config.export_ppm = true;
 				break;
 			}
 			default:

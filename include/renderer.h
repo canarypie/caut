@@ -30,6 +30,7 @@ public:
 	Renderer() = default;
 
 	void draw(std::span<const uint8_t> grid, const int alive, const int gen);
+	void output_ppm(std::span<const uint8_t> grid, const int gen);
 };
 
 //ansi terminal color string
