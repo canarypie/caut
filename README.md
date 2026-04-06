@@ -1,2 +1,1 @@
-# gameoflife
-Conway's Game of Life in C++
+# caut - cellular automaton in the terminal
