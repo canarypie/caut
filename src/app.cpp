@@ -8,8 +8,8 @@ int main(int argc, char** argv)
 {
 	auto config = Config::handle_arguments(argc, argv);
 
-	GOLSystem system(config);
-	system.run();
+	CautEngine engine(config);
+	engine.run();
 
 	return 0;
 }

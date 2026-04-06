@@ -39,7 +39,7 @@ std::array<uint16_t, 2> RuleSet::parse_rule(std::string_view rule)
 		uint16_t mask = 0;
 
 		for (int i = 0; i < rule_view.length(); i++) {
-			if (rule_view[i] == '0' || !std::isdigit(rule_view[i])) continue;
+			if (!std::isdigit(rule_view[i])) continue;
 
 			mask |= (1 << (rule_view[i] - '0'));
 		}

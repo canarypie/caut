@@ -11,7 +11,7 @@
 
 using namespace FileParser;
 
-GOLSystem::GOLSystem(const Config& config) : grid(config.rows, config.cols), simulations(config.simulations)
+CautEngine::CautEngine(const Config& config) : grid(config.rows, config.cols), simulations(config.simulations)
 {
 	rule = RuleSet(config.rule);
 
@@ -49,7 +49,7 @@ GOLSystem::GOLSystem(const Config& config) : grid(config.rows, config.cols), sim
 	if (config.export_ppm) mode = Mode::IMAGE_EXPORT;
 }
 
-void GOLSystem::load_pattern(std::string_view pattern)
+void CautEngine::load_pattern(std::string_view pattern)
 {
 	if (pattern.compare("glider") == 0) init_glider();
 	else if (pattern.compare("blinker") == 0) init_blinker();
@@ -57,7 +57,7 @@ void GOLSystem::load_pattern(std::string_view pattern)
 	else init_random();
 }
 
-void GOLSystem::init_glider()
+void CautEngine::init_glider()
 {
 	//Glider pattern
 	grid.data[0 * grid.cols + 1] = 1; 
@@ -67,7 +67,7 @@ void GOLSystem::init_glider()
 	grid.data[2 * grid.cols + 2] = 1;
 }
 
-void GOLSystem::init_blinker()
+void CautEngine::init_blinker()
 {
 	// Blinker pattern (horizontal)
 	grid.data[1 * grid.cols + 0] = 1;  // (1, 0)
@@ -75,7 +75,7 @@ void GOLSystem::init_blinker()
     grid.data[1 * grid.cols + 2] = 1;  // (1, 2)
 }
 
-void GOLSystem::init_diamond()
+void CautEngine::init_diamond()
 {
 	//Diamond pattern that expands recursively with Von Neumann Neighbors
 	const auto row_half = grid.rows / 2;
@@ -84,7 +84,7 @@ void GOLSystem::init_diamond()
 	grid.data[row_half * grid.cols + col_half] = 1;
 }
 
-void GOLSystem::init_random()
+void CautEngine::init_random()
 {
 	//Random pattern via std::mt19937
 	static std::random_device rd;
@@ -102,7 +102,7 @@ void GOLSystem::init_random()
 	}
 }
 
-void GOLSystem::next_generation(std::span<const uint8_t> current)
+void CautEngine::next_generation(std::span<const uint8_t> current)
 {
 	alive = 0;
 	
@@ -148,7 +148,7 @@ void GOLSystem::next_generation(std::span<const uint8_t> current)
 	gen++;
 }
 
-void GOLSystem::run()
+void CautEngine::run()
 {
 	for (int i = 0; i < simulations; i++) {
 		next_generation(current);
@@ -174,7 +174,7 @@ void GOLSystem::run()
 	}
 }
 
-void GOLSystem::swap_buffers()
+void CautEngine::swap_buffers()
 {
 	std::swap(current, future);
 }

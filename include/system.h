@@ -14,7 +14,7 @@ enum class Mode {
 	NORMAL
 };
 
-class GOLSystem {
+class CautEngine {
 private:
 	Grid grid;
 	int simulations;
@@ -33,7 +33,7 @@ private:
 	Mode mode = Mode::NORMAL;
 
 public:
-	GOLSystem(const Config& config);
+	CautEngine(const Config& config);
 	void run();
 
 private:
