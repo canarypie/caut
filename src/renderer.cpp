@@ -23,13 +23,22 @@ void Renderer::draw(std::span<const uint8_t> grid, const int alive, const int ge
 	framebuffer += cfg.sequence;
 	framebuffer += std::string(cfg.header) + std::to_string(gen) + '\n';
 
-	for (int y = 0; y < cfg.rows; y++) {
+	static constexpr float SCALE = 1.f;
+
+	const int downscale = (int)std::max(1.f, (float)(1.0f/SCALE));
+	const int upscale = (int)std::max(1.f, SCALE);
+
+	for (int y = 0; y < cfg.rows; y += downscale) {
 		const auto row_index = y * cfg.cols;
-		for (int x = 0; x < cfg.cols; x++) {
-			const auto idx = row_index + x;
-			framebuffer += color_map[grid[idx]];
+		for (int j = 0; j < upscale; j++) {
+			for (int x = 0; x < cfg.cols; x += downscale) {
+				const auto idx = row_index + x;
+				for (int i = 0; i < upscale; i++) {
+					framebuffer += color_map[grid[idx]];
+				}
+			}
+			framebuffer += '\n';
 		}
-		framebuffer += '\n';
 	}
 
 	framebuffer += std::string(cfg.footer) + std::to_string(alive) + '\n';
