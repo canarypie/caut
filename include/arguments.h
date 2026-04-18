@@ -29,6 +29,7 @@ struct Config {
 	bool demo = false;
 	int simulations = SIMULATIONS;
 	bool export_ppm = false;
+	bool benchmark = false;
 
 	static Config handle_arguments(const int count, char** arguments);
 };

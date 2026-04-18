@@ -9,9 +9,9 @@
 
 
 enum class Mode {
-	HEADLESS,
-	IMAGE_EXPORT,
-	NORMAL
+	NORMAL,
+	BENCHMARK,
+	IMAGE_EXPORT
 };
 
 class CautEngine {

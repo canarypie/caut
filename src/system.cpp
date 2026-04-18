@@ -1,15 +1,16 @@
-#include "system.h"
 #include <thread>
 #include <chrono>
 #include <random>
 #include <fstream>
 #include <iostream>
-#include "utility.h"
+#include "system.h"
 #include "arguments.h"
 #include "ruleset.h"
 #include "fileparser.h"
+#include "utility.h"
 
 using namespace FileParser;
+struct metrics performance_metrics;
 
 CautEngine::CautEngine(const Config& config) : grid(config.rows, config.cols), simulations(config.simulations)
 {
@@ -21,9 +22,6 @@ CautEngine::CautEngine(const Config& config) : grid(config.rows, config.cols), s
 		grid.rows = file.height;
 
 		rule = RuleSet(file.rule);
-
-		// grid.parse_grid(file);
-
 		grid.data = std::move(file.grid);
 	}
 	else if (!config.pattern.empty()) load_pattern(config.pattern);
@@ -47,6 +45,13 @@ CautEngine::CautEngine(const Config& config) : grid(config.rows, config.cols), s
 
 	//set run mode
 	if (config.export_ppm) mode = Mode::IMAGE_EXPORT;
+	else if (config.benchmark) {
+		mode = Mode::BENCHMARK;
+
+		performance_metrics.csv_buf.reserve(10 * simulations);
+		performance_metrics.time = std::chrono::steady_clock::now();
+		std::cout << "Enabled benchmark mode\n";
+	}
 }
 
 void CautEngine::load_pattern(std::string_view pattern)
@@ -155,7 +160,9 @@ void CautEngine::run()
 
 		//stop the simulation if all cells are dead
 		if (alive == 0) {
-			exit(1);
+			std::cout << gen << '\n';
+			if (mode == Mode::BENCHMARK) output_csv(performance_metrics.csv_buf);
+			exit(0);
 		}
 
 		swap_buffers();
@@ -168,7 +175,16 @@ void CautEngine::run()
 			case Mode::IMAGE_EXPORT:
 				renderer.output_ppm(current, gen);
 				break;
-			default:
+			case Mode::BENCHMARK:
+
+				const auto time_current = std::chrono::steady_clock::now();
+				const auto time_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(time_current - performance_metrics.time).count();
+
+				std::cout << time_ms << '\n';
+				write_csv(performance_metrics, gen);
+				if (gen == simulations) output_csv(performance_metrics.csv_buf);
+
+				performance_metrics.time = time_current;
 				break;
 		}
 	}
