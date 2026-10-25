@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(caut VERSION 1.0 LANGUAGES CXX)
+project(caut VERSION 1.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -30,7 +30,7 @@ endif()
 
 # version
 target_compile_definitions(${PROJECT_NAME} PRIVATE
-	GOL_VERSION="${PROJECT_VERSION}"
+	CAUT_VERSION="${PROJECT_VERSION}"
 )
 
 # Build Ordner nach /bin kopieren

@@ -37,13 +37,20 @@ void output_csv(std::string_view csv_buf)
 
 void print_usage()
 {
-	std::cout << "Usage: ConwayGOL [options] [pattern/file]\n\n"
+	std::cout << "Usage: caut [options] [pattern/file]\n\n"
               << "Options:\n"
-              << "  -f <file>       Load pattern from a .txt file\n"
-              << "  -s <num>        Set number of simulations (default: 240)\n"
-              << "  -r <num>        Set number of rows (default: 20)\n"
-              << "  -c <num>        Set number of cols (default: 20)\n"
-              << "  -v, --version   Display version information\n"
-              << "  -h, --help      Display this help message\n\n"
-              << "Patterns: glider, blinker, random (default)\n";
+              << "  -f <file>       Load pattern from a .txt or .rle file\n"
+              << "  -s <num>        Set number of simulations (default: 100)\n"
+              << "  -r <num>        Set number of rows (default: 10)\n"
+              << "  -c <num>        Set number of cols (default: 10)\n"
+			  << "  -p <pattern>    Load a pattern from predefined ones\n"
+              << "Patterns: glider, blinker, random (default)\n\n"
+
+			  << "  -R              Change ruleset\n"
+			  << "  -N              Change neighbor type\n"
+			  << "  -B	        Enable benchmark mode\n"
+			  << "  -E              Enable PPM export\n\n"
+
+              << "  -v              Display version information\n"
+              << "  -h              Display this help message\n\n";
 }

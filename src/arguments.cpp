@@ -22,7 +22,7 @@ Config Config::handle_arguments(const int count, char** arguments)
 				break;
 			}
 			case 'v':
-				std::cout << "ConwayGOL version " << GOL_VERSION << '\n'; 
+				std::cout << "caut version " << CAUT_VERSION << '\n'; 
 				exit(0);
 			case 'h':
 				print_usage();
