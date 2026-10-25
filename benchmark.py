@@ -5,13 +5,13 @@ timestamps = []
 generations = []
 
 with open("bin/output/benchmark.csv", mode = 'r') as file:
-    reader = csv.DictReader(file, fieldnames=["timestamp", "gen"])
+    reader = csv.DictReader(file, fieldnames=["gen", "timestamp"])
     for row in reader:
-        timestamps.append(row['timestamp'])
-        generations.append(row['gen'])
+        generations.append(int(row['gen']))
+        timestamps.append(float(row['timestamp']) / 1_000_000)
 
-plt.xlabel("Time")
-plt.ylabel("Generation")
+plt.xlabel("Generation")
+plt.ylabel("Time in ms")
 
-plt.plot(timestamps, generations)
-plt.savefig("bin/output/benchmark.png")
+plt.plot(generations, timestamps)
+plt.savefig("bin/output/benchmark.png", bbox_inches='tight')

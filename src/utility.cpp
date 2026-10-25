@@ -19,11 +19,11 @@ std::vector<unsigned char> read_buffer(std::string_view filePath)
 void write_csv(metrics& metrics, int gen)
 {
 	// t-s Diagram for analyzing delta t for each simulation round
-	// convert time to milliseconds int
+	// convert time to nanoseconds int
 	const auto time_current = std::chrono::steady_clock::now();
 	const auto time_ms = std::chrono::duration_cast<std::chrono::nanoseconds>(time_current - metrics.time).count();
 
-	const std::string row = std::format("{},{}\n", time_ms, gen);
+	const std::string row = std::format("{},{}\n", gen, time_ms);
 	metrics.csv_buf += row;
 }
 
