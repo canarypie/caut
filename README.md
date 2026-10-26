@@ -46,15 +46,11 @@ This assumes you are running a POSIX compliant OS such as Linux/macOS/BSD. If yo
 
 <table>
   <tr>
-    <td> <img src="media/diamond.gif" width="250" alt="diamond"/> </td>
-    <td> <img src="media/rectangular.gif" width="250" alt="rectangular"/> </td>
-    <td> <img src="media/diamoeba.gif" width="250" alt="diamoeba"/> </td>
+    <td> <img src="media/diamond.gif" width="300" alt="diamond"/> </td>
+    <td> <img src="media/rectangular.gif" width="300" alt="rectangular"/> </td>
+    <td> <img src="media/diamoeba.gif" width="300" alt="diamoeba"/> </td>
   </tr>
 </table>
-
-![1](media/diamond.gif)
-![2](media/rectangular.gif)
-![3](media/diamoeba.gif)
 
 ## PPM export
 
